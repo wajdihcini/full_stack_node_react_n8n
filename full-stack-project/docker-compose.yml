@@ -1,0 +1,43 @@
+# ==============================================================
+# Docker Compose — Full-Stack AI Chatbot
+# Services: frontend, backend, n8n, qdrant
+# ==============================================================
+
+services:
+  # ─── Frontend (React + Vite) ──────────────────────────────
+  frontend:
+    container_name: chatbot-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - chatbot-network
+
+  # ─── Backend (Node.js + Express) ──────────────────────────
+  backend:
+    container_name: chatbot-backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+    volumes:
+      - backend-uploads:/app/uploads
+    networks:
+      - chatbot-network
+
+volumes:
+  backend-uploads:
+
+networks:
+  chatbot-network:
+    driver: bridge
